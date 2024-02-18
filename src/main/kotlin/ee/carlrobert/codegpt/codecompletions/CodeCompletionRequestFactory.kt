@@ -5,15 +5,23 @@ import ee.carlrobert.codegpt.settings.service.llama.LlamaSettings
 import ee.carlrobert.codegpt.settings.service.llama.LlamaSettingsState
 import ee.carlrobert.codegpt.settings.service.openai.OpenAISettings
 import ee.carlrobert.llm.client.llama.completion.LlamaCompletionRequest
-import ee.carlrobert.llm.client.openai.completion.request.OpenAITextCompletionRequest
+import ee.carlrobert.llm.client.openai.completion.request.OpenAIChatCompletionRequest
+import ee.carlrobert.llm.client.openai.completion.request.OpenAIChatCompletionStandardMessage
+
 
 object CodeCompletionRequestFactory {
-    fun buildOpenAIRequest(details: InfillRequestDetails): OpenAITextCompletionRequest {
-        return OpenAITextCompletionRequest.Builder(details.prefix)
-            .setSuffix(details.suffix)
+    fun buildOpenAIRequest(details: InfillRequestDetails): OpenAIChatCompletionRequest {
+        val prompt = InfillPromptTemplate.OPENAI.buildPrompt(
+            details.prefix,
+            details.suffix
+        )
+        val settings = OpenAISettings.getCurrentState()
+        return OpenAIChatCompletionRequest.Builder(listOf(OpenAIChatCompletionStandardMessage("user", prompt)))
+            .setModel(settings.model)
             .setStream(true)
             .setMaxTokens(OpenAISettings.getCurrentState().codeCompletionMaxTokens)
             .setTemperature(0.4)
+//            .setOverriddenPath(if(settings.isUsingCustomPath) settings.path else null)
             .build()
     }
 

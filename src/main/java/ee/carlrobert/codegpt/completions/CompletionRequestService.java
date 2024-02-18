@@ -99,7 +99,7 @@ public final class CompletionRequestService {
       CompletionEventListener<String> eventListener) {
     return switch (GeneralSettings.getCurrentState().getSelectedService()) {
       case OPENAI -> CompletionClientProvider.getOpenAIClient()
-          .getCompletionAsync(
+          .getChatCompletionAsync(
               CodeCompletionRequestFactory.INSTANCE.buildOpenAIRequest(requestDetails),
               eventListener);
       case LLAMA_CPP -> CompletionClientProvider.getLlamaClient()
